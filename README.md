@@ -103,6 +103,26 @@ The final answer is: $\boxed{6}$
 Dataset available at:
 [shoubing35/ones_digit_sft_dataset](https://huggingface.co/datasets/shoubing35/ones_digit_sft_dataset)
 
+## Lessons Learned
+
+Throughout this project, I encountered several non-obvious challenges and insights that shaped the final training pipeline:
+
+1. **Verifying the SFT Pipeline via Overfitting**  
+   To confirm the SFT setup was correct, I first trained the model to overfit a single example until it could reproduce the solution verbatim.  
+   *Lesson:* A training loss below 0.01 is typically needed to ensure convergence, and TRL’s Trainer automatically handles token alignment (offset-by-1) between input and labels—no manual shift is needed.
+
+2. **Tooling Matters: Avoiding Mismatched Libraries**  
+   I initially tried [OpenRLHF](https://github.com/OpenRLHF/openrlhf) for PPO, but it’s optimized for multi-GPU distributed training and isn't suited to lightweight setups like Google Colab.  
+   *Lesson:* Matching your compute constraints to the right tooling is critical—TRL is much better suited for single-GPU experiments.
+
+3. **Model Size and Memory Constraints**  
+   Running PPO requires loading a policy model, reference model, and reward model simultaneously. Colab (T4/A100) can handle ~1B parameter models, but not larger.  
+   *Lesson:* Model size must be chosen with full RLHF memory requirements in mind—not just inference or SFT alone.
+
+4. **Problem-Aware Dataset Design is Key**  
+   On top of tuning hyperparameters, performance hinges on understanding the model’s *specific* failure mode (e.g., modular arithmetic errors). I adjusted the dataset structure to emphasize high-variance distractors and mod 10 patterns.  
+   *Lesson:* Targeted dataset engineering, based on failure analysis, can lead to far greater accuracy gains than brute-force training.
+
 ## About
 Built and maintained by Charles Chen.
 This repo is a showcase of reasoning generalization using reward-model-driven fine-tuning of LLMs.
