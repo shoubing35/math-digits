@@ -1,4 +1,4 @@
-# Digit Matching with RLHF on LLMs
+# Digit Matching with SFT on LLMs
 
 This project fine-tunes an open-source language model to solve a symbolic reasoning problem:
 
