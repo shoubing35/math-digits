@@ -26,14 +26,15 @@ LLMs often struggle with consistent symbolic reasoning—especially when small i
 - upload / # Upload dataset to HF
 - trl_custom/ # Optional: trainer overrides
 
-## Quickstart (Colab)
-https://colab.research.google.com/drive/1lnjfql_zdhYa4HXQmsCoTtNffjArq8W-#scrollTo=Knd7wHdmddB1
+## Quickstart
+- Colab: https://colab.research.google.com/drive/1lnjfql_zdhYa4HXQmsCoTtNffjArq8W-?usp=drive_link
+- Generate dataset, run SFT training, compare inference results between base model and SFT-trained model
 
-## Results (Validation Set)
-Model	Accuracy
-Base (no fine-tuning)	0/10
-SFT (LoRA, 4 epochs)	5/10
-PPO work-in-progress
+## Results
+Model	Accuracy on Validation Set:
+- Base (no fine-tuning)	0/10
+- SFT (LoRA, 4 epochs)	5/10
+- PPO (work-in-progress)
 
 Failure Types:
 - Incorrect congruence setup
