@@ -1,69 +1,8 @@
-# Copyright 2025 The HuggingFace Team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+##########
+# WIP
+##########
 
-import shutil
-
-import torch
-from accelerate import PartialState
-from datasets import load_dataset
-from transformers import (
-    AutoModelForCausalLM,
-    AutoModelForSequenceClassification,
-    AutoTokenizer,
-    HfArgumentParser,
-)
-
-from trl import (
-    ModelConfig,
-    PPOConfig,
-    PPOTrainer,
-    ScriptArguments,
-    get_kbit_device_map,
-    get_peft_config,
-    get_quantization_config,
-)
-from trl.trainer.utils import SIMPLE_CHAT_TEMPLATE
-
-"""
-python -i examples/scripts/ppo/ppo.py \
-    --dataset_name trl-internal-testing/descriptiveness-sentiment-trl-style \
-    --dataset_train_split descriptiveness \
-    --learning_rate 3e-6 \
-    --output_dir models/minimal/ppo \
-    --per_device_train_batch_size 64 \
-    --gradient_accumulation_steps 1 \
-    --total_episodes 10000 \
-    --model_name_or_path EleutherAI/pythia-1b-deduped \
-    --missing_eos_penalty 1.0
-
-accelerate launch --config_file examples/accelerate_configs/deepspeed_zero3.yaml \
-    examples/scripts/ppo/ppo.py \
-    --dataset_name trl-internal-testing/descriptiveness-sentiment-trl-style \
-    --dataset_train_split descriptiveness \
-    --output_dir models/minimal/ppo \
-    --num_ppo_epochs 1 \
-    --num_mini_batches 1 \
-    --learning_rate 3e-6 \
-    --per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 16 \
-    --total_episodes 10000 \
-    --model_name_or_path EleutherAI/pythia-1b-deduped \
-    --sft_model_path EleutherAI/pythia-1b-deduped \
-    --reward_model_path EleutherAI/pythia-1b-deduped \
-    --local_rollout_forward_batch_size 1 \
-    --missing_eos_penalty 1.0
-"""
+# Inference n responses, and create pairwise comparisons for manual labeling
 
 if __name__ == "__main__":
     parser = HfArgumentParser((ScriptArguments, PPOConfig, ModelConfig))

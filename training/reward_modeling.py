@@ -1,49 +1,6 @@
-# Copyright 2025 The HuggingFace Team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""
-Full training:
-python examples/scripts/reward_modeling.py \
-    --model_name_or_path Qwen/Qwen2-0.5B-Instruct \
-    --dataset_name trl-lib/ultrafeedback_binarized \
-    --output_dir Qwen2-0.5B-Reward \
-    --per_device_train_batch_size 8 \
-    --num_train_epochs 1 \
-    --gradient_checkpointing True \
-    --learning_rate 1.0e-5 \
-    --logging_steps 25 \
-    --eval_strategy steps \
-    --eval_steps 50 \
-    --max_length 2048
-
-LoRA:
-python examples/scripts/reward_modeling.py \
-    --model_name_or_path Qwen/Qwen2-0.5B-Instruct \
-    --dataset_name trl-lib/ultrafeedback_binarized \
-    --output_dir Qwen2-0.5B-Reward-LoRA \
-    --per_device_train_batch_size 8 \
-    --num_train_epochs 1 \
-    --gradient_checkpointing True \
-    --learning_rate 1.0e-4 \
-    --logging_steps 25 \
-    --eval_strategy steps \
-    --eval_steps 50 \
-    --max_length 2048 \
-    --use_peft \
-    --lora_r 32 \
-    --lora_alpha 16
-"""
+##########
+# WIP
+##########
 
 import warnings
 
@@ -61,7 +18,6 @@ from trl import (
     get_quantization_config,
     setup_chat_format,
 )
-
 
 if __name__ == "__main__":
     parser = HfArgumentParser((ScriptArguments, RewardConfig, ModelConfig))

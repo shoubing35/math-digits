@@ -1,3 +1,9 @@
+##########
+# WIP
+##########
+
+# Score completion using reward model
+
 import shutil
 
 import torch
