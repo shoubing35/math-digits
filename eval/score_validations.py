@@ -1,16 +1,5 @@
-# Copyright 2025 The HuggingFace Team. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# Inference using 1.) base model, 2.) sft-trained model, 3.) grpo-trained model
+# Extract boxed answer, compare against answer and calculate accuracy score
 
 import shutil
 
@@ -35,44 +24,13 @@ from trl import (
 )
 from trl.trainer.utils import SIMPLE_CHAT_TEMPLATE
 
-"""
-python -i examples/scripts/ppo/ppo.py \
-    --dataset_name trl-internal-testing/descriptiveness-sentiment-trl-style \
-    --dataset_train_split descriptiveness \
-    --learning_rate 3e-6 \
-    --output_dir models/minimal/ppo \
-    --per_device_train_batch_size 64 \
-    --gradient_accumulation_steps 1 \
-    --total_episodes 10000 \
-    --model_name_or_path EleutherAI/pythia-1b-deduped \
-    --missing_eos_penalty 1.0
-
-accelerate launch --config_file examples/accelerate_configs/deepspeed_zero3.yaml \
-    examples/scripts/ppo/ppo.py \
-    --dataset_name trl-internal-testing/descriptiveness-sentiment-trl-style \
-    --dataset_train_split descriptiveness \
-    --output_dir models/minimal/ppo \
-    --num_ppo_epochs 1 \
-    --num_mini_batches 1 \
-    --learning_rate 3e-6 \
-    --per_device_train_batch_size 1 \
-    --gradient_accumulation_steps 16 \
-    --total_episodes 10000 \
-    --model_name_or_path EleutherAI/pythia-1b-deduped \
-    --sft_model_path EleutherAI/pythia-1b-deduped \
-    --reward_model_path EleutherAI/pythia-1b-deduped \
-    --local_rollout_forward_batch_size 1 \
-    --missing_eos_penalty 1.0
-"""
 import re
 
 def extract_boxed(text):
     """
     Extracts the numerical value inside the first \boxed{} expression in the given string.
-
     Parameters:
         text (str): The input string containing LaTeX-style boxed expression.
-
     Returns:
         int or None: The extracted number if found, otherwise None.
     """
@@ -135,6 +93,7 @@ if __name__ == "__main__":
         quantization_config=quantization_config,
     )
 
+    # load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.model_name_or_path, padding_side="left", trust_remote_code=model_args.trust_remote_code
     )
@@ -142,27 +101,12 @@ if __name__ == "__main__":
     if tokenizer.chat_template is None:
         tokenizer.chat_template = SIMPLE_CHAT_TEMPLATE
 
-    print("Vocab size:", tokenizer.vocab_size)  # charles debug
-
-    value_model = AutoModelForSequenceClassification.from_pretrained(
-        training_args.reward_model_path, trust_remote_code=model_args.trust_remote_code, num_labels=1
-    )
-    reward_model = AutoModelForSequenceClassification.from_pretrained(
-        training_args.reward_model_path, trust_remote_code=model_args.trust_remote_code, num_labels=1
-    )
-    policy = AutoModelForCausalLM.from_pretrained(
-        training_args.sft_model_path, trust_remote_code=model_args.trust_remote_code
-    )
-
-    # charles: added for baseline
+    # load base model
     base_model = AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path, trust_remote_code=model_args.trust_remote_code
     )
 
-    print("Value model vocab size:", value_model.config.vocab_size)  # charles debug
-    print("Reward model vocab size:", reward_model.config.vocab_size)  # charles debug
-    print("Policy model vocab size:", policy.config.vocab_size)  # charles debug
-
+    # load peft config
     peft_config = get_peft_config(model_args)
     if peft_config is None:
         ref_policy = AutoModelForCausalLM.from_pretrained(
@@ -196,25 +140,11 @@ if __name__ == "__main__":
     text_instr = "You are a math expert with clear and concise reasoning. Solve this problem step-by-step and box your final numerical answer:"
 
     # original problem
-    # text_input = "A book with 50 pages, numbered 1 to 50, has its pages renumbered in reverse (page 1 becomes 50, page 2 becomes 49, etc.). How many pages retain the same ones digit before and after renumbering?"
-
-    # validation problem
-    text_input = "A booklet contains 99 pages, numbered from 1 to 99. The pages are then renumbered so that page 1 becomes 99, page 2 becomes 98, and so on. How many pages keep the same ones digit after renumbering?"
-
-    # subproblem #1
-    # text_input = "A book with 50 pages, numbered 1 to 50, has its pages renumbered in reverse (page 1 becomes 50, page 2 becomes 49, etc.). What does page 32 become?"
-
-    # subproblem #2
-    # text_input = "How many integers between 1 and 30 have the same tens digit as the number 23?"
+    text_input = "A book with 50 pages, numbered 1 to 50, has its pages renumbered in reverse (page 1 becomes 50, page 2 becomes 49, etc.). How many pages retain the same ones digit before and after renumbering?"
 
     text_inference = text_instr + "\n" + text_input
     print("Manual question:")
     print(text_inference)
-
-
-
-    # for i, input_ids in enumerate(inputs["input_ids"]): # debug: batch generate index out of range
-    #     print(f"Padded input {i}: {len(input_ids)} tokens")
 
     # ################
     # # Generate completions before training
