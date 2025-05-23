@@ -1,5 +1,9 @@
-# charles + gpt
-# Part 2: Process CSV and Extract Chosen & Rejected
+##########
+# WIP
+##########
+
+# Process preference CSV, Extract Chosen & Rejected
+
 from datasets import Dataset
 import pandas as pd
 
