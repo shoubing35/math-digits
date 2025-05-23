@@ -36,8 +36,26 @@ def extract_boxed(text):
         return int(match.group(1))
     return None
 
+"""
+# charles colab script 
+!python eval/inference_trained_policy.py \
+  --dataset_name trl-internal-testing/descriptiveness-sentiment-trl-style \
+  --model_name_or_path meta-llama/Llama-3.2-1B-Instruct \
+  --reward_model_path meta-llama/Llama-3.2-1B-Instruct \
+  --sft_model_path meta-llama/Llama-3.2-1B-Instruct \
+  --use_peft \
+  --load_in_8bit \
+  --lora_r 16 \
+  --lora_alpha 32 \
+  --lora_dropout 0.05
+"""
+
 if __name__ == "__main__":
     parser = HfArgumentParser((ScriptArguments, PPOConfig, ModelConfig))
+    # dataset_name: not used (defined in utils.py)
+    # model_name_or_path: tokenizer model
+    # reward_model_path: not used
+    # sft_model_path: policy model
     script_args, training_args, model_args = parser.parse_args_into_dataclasses()
     # remove output_dir if exists
     shutil.rmtree(training_args.output_dir, ignore_errors=True)
@@ -76,15 +94,15 @@ if __name__ == "__main__":
 
     # print("Vocab size:", tokenizer.vocab_size)  # charles debug
 
-    value_model = AutoModelForSequenceClassification.from_pretrained(
-        training_args.reward_model_path, trust_remote_code=model_args.trust_remote_code, num_labels=1
-    )
-    reward_model = AutoModelForSequenceClassification.from_pretrained(
-        training_args.reward_model_path, trust_remote_code=model_args.trust_remote_code, num_labels=1
-    )
-    policy = AutoModelForCausalLM.from_pretrained(
-        training_args.sft_model_path, trust_remote_code=model_args.trust_remote_code
-    )
+    # value_model = AutoModelForSequenceClassification.from_pretrained(
+    #     training_args.reward_model_path, trust_remote_code=model_args.trust_remote_code, num_labels=1
+    # )
+    # reward_model = AutoModelForSequenceClassification.from_pretrained(
+    #     training_args.reward_model_path, trust_remote_code=model_args.trust_remote_code, num_labels=1
+    # )
+    # policy = AutoModelForCausalLM.from_pretrained(
+    #     training_args.sft_model_path, trust_remote_code=model_args.trust_remote_code
+    # )
 
     # charles: added for baseline
     base_model = AutoModelForCausalLM.from_pretrained(
