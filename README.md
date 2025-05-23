@@ -20,11 +20,11 @@ LLMs often struggle with consistent symbolic reasoning, especially when small in
 
 ## Repo Structure
 
-- data/ # Dataset generation and CSV
-- training/ # SFT and PPO training scripts
-- eval/ # Evaluation logic and scoring
-- upload / # Upload dataset to HF
-- trl_custom/ # Optional: trainer overrides
+- data/ Dataset generation and CSV
+- training/ SFT and PPO training scripts
+- eval/ Evaluation logic and scoring
+- upload / Upload dataset to HF
+- trl_custom/ Optional: trainer overrides
 
 ## Quickstart
 - Colab: https://colab.research.google.com/drive/1lnjfql_zdhYa4HXQmsCoTtNffjArq8W-?usp=drive_link
