@@ -53,8 +53,8 @@ def extract_boxed(text):
 if __name__ == "__main__":
     parser = HfArgumentParser((ScriptArguments, PPOConfig, ModelConfig))
     # dataset_name: not used (defined in utils.py)
-    # model_name_or_path: tokenizer model
-    # reward_model_path: not used
+    # model_name_or_path: tokenizer model, base model
+    # reward_model_path: not used (defined in ppo_config.py)
     # sft_model_path: policy model
     script_args, training_args, model_args = parser.parse_args_into_dataclasses()
     # remove output_dir if exists
