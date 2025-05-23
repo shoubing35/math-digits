@@ -1,3 +1,23 @@
+# Inference using 1.) base model, 2.) sft-trained model, 3.) grpo-trained model
+
+"""
+# Charles Colab script
+!python eval/inference_trained_policy.py \
+  --dataset_name trl-internal-testing/descriptiveness-sentiment-trl-style \
+  --model_name_or_path meta-llama/Llama-3.2-1B-Instruct \
+  --reward_model_path meta-llama/Llama-3.2-1B-Instruct \
+  --sft_model_path meta-llama/Llama-3.2-1B-Instruct \
+  --use_peft \
+  --load_in_8bit \
+  --lora_r 16 \
+  --lora_alpha 32 \
+  --lora_dropout 0.05
+    # dataset_name: not used (defined in utils.py)
+    # model_name_or_path: tokenizer model, base model
+    # reward_model_path: not used (defined in ppo_config.py)
+    # sft_model_path: policy model
+"""
+
 import shutil
 
 import torch
@@ -35,24 +55,6 @@ def extract_boxed(text):
     if match:
         return int(match.group(1))
     return None
-
-"""
-# charles colab script 
-!python eval/inference_trained_policy.py \
-  --dataset_name trl-internal-testing/descriptiveness-sentiment-trl-style \
-  --model_name_or_path meta-llama/Llama-3.2-1B-Instruct \
-  --reward_model_path meta-llama/Llama-3.2-1B-Instruct \
-  --sft_model_path meta-llama/Llama-3.2-1B-Instruct \
-  --use_peft \
-  --load_in_8bit \
-  --lora_r 16 \
-  --lora_alpha 32 \
-  --lora_dropout 0.05
-    # dataset_name: not used (defined in utils.py)
-    # model_name_or_path: tokenizer model, base model
-    # reward_model_path: not used (defined in ppo_config.py)
-    # sft_model_path: policy model
-"""
 
 if __name__ == "__main__":
     # parse script arguments
