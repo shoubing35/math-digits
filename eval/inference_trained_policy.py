@@ -48,14 +48,15 @@ def extract_boxed(text):
   --lora_r 16 \
   --lora_alpha 32 \
   --lora_dropout 0.05
-"""
-
-if __name__ == "__main__":
-    parser = HfArgumentParser((ScriptArguments, PPOConfig, ModelConfig))
     # dataset_name: not used (defined in utils.py)
     # model_name_or_path: tokenizer model, base model
     # reward_model_path: not used (defined in ppo_config.py)
     # sft_model_path: policy model
+"""
+
+if __name__ == "__main__":
+    # parse script arguments
+    parser = HfArgumentParser((ScriptArguments, PPOConfig, ModelConfig))
     script_args, training_args, model_args = parser.parse_args_into_dataclasses()
     # remove output_dir if exists
     shutil.rmtree(training_args.output_dir, ignore_errors=True)
@@ -85,6 +86,7 @@ if __name__ == "__main__":
         quantization_config=quantization_config,
     )
 
+    # load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(
         model_args.model_name_or_path, padding_side="left", trust_remote_code=model_args.trust_remote_code
     )
@@ -92,27 +94,12 @@ if __name__ == "__main__":
     if tokenizer.chat_template is None:
         tokenizer.chat_template = SIMPLE_CHAT_TEMPLATE
 
-    # print("Vocab size:", tokenizer.vocab_size)  # charles debug
-
-    # value_model = AutoModelForSequenceClassification.from_pretrained(
-    #     training_args.reward_model_path, trust_remote_code=model_args.trust_remote_code, num_labels=1
-    # )
-    # reward_model = AutoModelForSequenceClassification.from_pretrained(
-    #     training_args.reward_model_path, trust_remote_code=model_args.trust_remote_code, num_labels=1
-    # )
-    # policy = AutoModelForCausalLM.from_pretrained(
-    #     training_args.sft_model_path, trust_remote_code=model_args.trust_remote_code
-    # )
-
-    # charles: added for baseline
+    # load base model
     base_model = AutoModelForCausalLM.from_pretrained(
         model_args.model_name_or_path, trust_remote_code=model_args.trust_remote_code
     )
 
-    # print("Value model vocab size:", value_model.config.vocab_size)  # charles debug
-    # print("Reward model vocab size:", reward_model.config.vocab_size)  # charles debug
-    # print("Policy model vocab size:", policy.config.vocab_size)  # charles debug
-
+    # load peft config
     peft_config = get_peft_config(model_args)
     if peft_config is None:
         ref_policy = AutoModelForCausalLM.from_pretrained(
