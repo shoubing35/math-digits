@@ -104,17 +104,16 @@ Dataset available at:
 | LoRA             | 6 GB        | Base + Reward + Ref |
 | Q-LoRA           | 3 GB        | Int8 base model |
 
-### Debugging Intentional Overfitting
+### Training Pipeline Verification via Single-Problem Memorization
 
 ### Goal
 Verify training pipeline correctness by intentionally overfitting a model to 1 problem. Success = model recites solution exactly.
 
 ### Key Fixes
-- Use `generate()` not `pipeline()` at inference
-- `training_loss < 0.01` was necessary to reproduce full solution
-- Important PEFT settings:
-  - `modules_to_save = ["lm_head", "embed_tokens"]` drastically speeds up convergence
-  - Adjusting `r` and `lora_alpha` reduced required epochs
+- `training_loss < 0.01` was critical to successful memorization
+- Drastic convergence time improvement by setting PEFT tuning parameter `modules_to_save = ["lm_head", "embed_tokens"]`
+- Further (mild) improvement in convergence time by increasing `r` and `lora_alpha`
+- Use `generate()` not `pipeline()` at inference to prevent infinite generation
 
 ### Generalizing to 100 Problems
 
